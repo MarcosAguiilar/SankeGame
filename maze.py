@@ -19,6 +19,5 @@ for cordinate_y in range(MAP_HEIGHT):
     print("|")
 print("+" + "-" * MAP_WIDTH * 3 + "+")
 
-direccion = input("Donde te quieres mover? [WASD]:")
 direction = readchar.readchar()
 
