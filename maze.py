@@ -47,16 +47,16 @@ while not end_game:
     # generacion de objetos
     while len(map_objects) < NUM_OF_MAP_OBJECTS:
         new_position = [random.randint(0, MAP_WIDTH - 1), random.randint(0, MAP_HEIGHT - 1)]
-        if new_position not in map_objects and new_position != my_position:
+        if new_position not in map_objects and new_position != my_position and obstacle_definition[new_position[POS_Y]][new_position[POS_X]] != "#":
             map_objects.append(new_position)
 
-    print("+" + "-" * MAP_WIDTH * 3 + "+")
+    print("+" + "-" * MAP_WIDTH * 2 + "+")
     for cordinate_y in range(MAP_HEIGHT):
         print("|", end="")
 
         for cordinate_x in range(MAP_WIDTH):
 
-            char_to_draw = " "
+            char_to_draw = "  "
 
             tail_in_position = None
 
@@ -69,60 +69,58 @@ while not end_game:
                         if new_position not in map_objects and new_position != my_position:
                             map_objects.append(new_position)
                     else:
-                        char_to_draw = "*"
+                        char_to_draw = " *"
 
             for tails in tail:
                 if tails[POS_X] == cordinate_x and tails[POS_Y] == cordinate_y:
-                    char_to_draw = "@"
+                    char_to_draw = " @"
                     tail_in_position = tails
 
 
             if my_position[POS_X] == cordinate_x and my_position[POS_Y] == cordinate_y:
-                char_to_draw = "@"
+                char_to_draw = " @"
 
                 if tail_in_position:
                     died = True
                     end_game = True
 
             if obstacle_definition[cordinate_y][cordinate_x] == "#":
-                char_to_draw = "#"
+                char_to_draw = "##"
 
-            print(" {} ".format(char_to_draw), end="")
+            for wall in obstacle_definition:
+                if obstacle_definition[cordinate_y] == my_position[POS_X] and obstacle_definition[cordinate_x] == my_position[POS_Y]:
+                    died = True
+                    end_game = True
+
+            print("{}".format(char_to_draw), end="")
         print("|")
-    print("+" + "-" * MAP_WIDTH * 3 + "+")
+    print("+" + "-" * MAP_WIDTH * 2 + "+")
 
     direction = readchar.readchar()
 
+    new_position = None
+
     if direction == "w" or direction == "W":
-        tail.insert(0, my_position.copy())
-        tail = tail[:tail_length]
-        if my_position[POS_Y] > 0:
-            my_position[POS_Y] -= 1
-        else:
-            my_position[POS_Y] = MAP_HEIGHT - 1
+        new_position = [my_position[POS_X], (my_position[POS_Y] - 1) % MAP_HEIGHT]
+
     elif direction == "s" or direction == "S":
-        tail.insert(0, my_position.copy())
-        tail = tail[:tail_length]
-        if my_position[POS_Y] < MAP_HEIGHT - 1:
-            my_position[POS_Y] += 1
-        else:
-            my_position[POS_Y] = 0
+        new_position = [my_position[POS_X], (my_position[POS_Y] + 1) % MAP_HEIGHT]
+
     elif direction == "a" or direction == "A":
-        tail.insert(0, my_position.copy())
-        tail = tail[:tail_length]
-        if my_position[POS_X] > 0:
-            my_position[POS_X] -= 1
-        else:
-            my_position[POS_X] = MAP_WIDTH - 1
+        new_position = [(my_position[POS_X] - 1) % MAP_WIDTH, my_position[POS_Y]]
+
     elif direction == "d" or direction == "D":
-        tail.insert(0, my_position.copy())
-        tail = tail[:tail_length]
-        if my_position[POS_X] < MAP_WIDTH - 1:
-            my_position[POS_X] += 1
-        else:
-            my_position[POS_X] = 0
+        new_position = [(my_position[POS_X] + 1) % MAP_WIDTH, my_position[POS_Y]]
+
     elif direction == "q" or direction == "Q":
         end_game = True
+
+
+    if new_position:
+        if obstacle_definition[new_position[POS_Y]][new_position[POS_X]] != "#":
+            tail.insert(0, my_position.copy())
+            tail = tail[:tail_length]
+            my_position =new_position
 
     os.system("cls")
 
